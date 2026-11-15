@@ -56,17 +56,10 @@
     </header>
 
     <main id="calculator" class="app-shell">
-      <section class="route-strip" aria-label="Route summary">
-        <div class="strip-label"><span data-icon="truck"></span><strong>Route analysis</strong></div>
-        <div><strong id="strip-payout">$1,700.00</strong><span>payout</span></div>
-        <div><strong id="strip-loaded">1,000</strong><span>mi loaded</span></div>
-        <div><strong id="strip-deadhead">170</strong><span>mi deadhead</span></div>
-        <div><strong id="strip-total">1,170</strong><span>mi total</span></div>
-      </section>
-
-      <form id="profit-form" class="calculator-grid" novalidate>
-        <fieldset class="input-panel">
-          <legend><span class="step">1</span><span><strong>Load payout &amp; miles</strong><small>The offer, route, and fuel price.</small></span></legend>
+      <form id="profit-form" novalidate>
+        <fieldset class="load-inputs">
+          <legend>This load</legend>
+          <div class="load-fields">
           <label><span>Payout <span class="hint" title="Total route payout including fuel surcharge.">?</span></span>
             <span class="input-wrap"><span>$</span><input name="payout" type="number" min="0" max="1000000" step="10" inputmode="decimal" value="1700"></span>
           </label>
@@ -79,24 +72,29 @@
           <label>Deadhead miles
             <span class="input-wrap"><input name="deadheadMiles" type="number" min="0" max="25000" step="1" inputmode="numeric" value="170"><span>mi</span></span>
           </label>
-          <label>Diesel price
-            <span class="input-wrap"><span>$</span><input name="fuelPrice" type="number" min="0" max="100" step="0.001" inputmode="decimal" value="4.50"><span>/gal</span></span>
-          </label>
-          <details id="fuel-lookup">
-            <summary>Look up diesel prices</summary>
-            <label for="fuel-zip">U.S. ZIP (optional)</label>
-            <input id="fuel-zip" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="83702">
-            <div class="fuel-actions"><button type="button" id="fuel-find">Find average</button><button type="button" id="fuel-locate">Use my location</button></div>
-            <small>Location uses approximate coordinates to find your state. Leave ZIP blank for the U.S. average.</small>
+          </div>
+        </fieldset>
+        <details id="fuel-lookup" class="preferences">
+          <summary>Diesel <span id="fuel-summary" aria-live="polite">Checking weekly price…</span></summary>
+          <div class="fuel-options">
+            <label for="fuel-zip">Fuel stop ZIP</label>
+            <input id="fuel-zip" type="text" inputmode="numeric" maxlength="5" autocomplete="postal-code" placeholder="5 digits">
+            <div class="fuel-actions">
+              <button type="button" id="fuel-find">Use ZIP</button>
+              <button type="button" id="fuel-locate">Use my location</button>
+              <button type="button" id="fuel-national">Use U.S. average</button>
+            </div>
+            <label>Custom diesel price ($/gal)
+              <input name="fuelPrice" type="number" min="0" max="100" step="0.001" inputmode="decimal" value="4.50">
+            </label>
             <p id="fuel-status" role="status"></p>
-            <button id="fuel-apply" type="button" hidden>Use this price</button>
             <a id="fuel-daily" href="https://gasprices.aaa.com/" target="_blank" rel="noopener">AAA daily diesel report ↗</a>
             <small>ZIP data from <a href="https://www.geonames.org/">GeoNames</a> via <a href="https://www.zippopotam.us/">Zippopotam.us</a>.</small>
-          </details>
-        </fieldset>
-
-        <fieldset class="input-panel">
-          <legend><span class="step">2</span><span><strong>Truck economics</strong><small>Fuel and operating costs.</small></span></legend>
+          </div>
+        </details>
+        <details class="preferences" id="truck-settings">
+          <summary>Truck &amp; pay settings <span id="settings-summary"></span></summary>
+          <div class="load-fields">
           <label><span>MPG <span class="hint" title="Expected fuel economy for this route.">?</span></span>
             <span class="input-wrap"><input name="mpg" type="number" min="0.1" max="100" step="0.1" inputmode="decimal" value="10"><span>mpg</span></span>
           </label>
@@ -109,23 +107,20 @@
           <label>Maintenance per mile
             <span class="input-wrap"><span>$</span><input name="maintenancePerMile" type="number" min="0" max="100" step="0.01" inputmode="decimal" value="0.15"><span>/mi</span></span>
           </label>
-        </fieldset>
-
-        <fieldset class="input-panel">
-          <legend><span class="step">3</span><span><strong>Crew &amp; fixed costs</strong><small>Pay splits and other costs.</small></span></legend>
           <label>Driver percentage
             <span class="input-wrap"><input name="driverPercentage" type="number" min="0" max="100" step="0.5" inputmode="decimal" value="30"><span>%</span></span>
           </label>
           <label>Dispatcher percentage
             <span class="input-wrap"><input name="dispatcherPercentage" type="number" min="0" max="100" step="0.5" inputmode="decimal" value="5"><span>%</span></span>
           </label>
-          <label>Other route costs
-            <span class="input-wrap"><span>$</span><input name="otherCosts" type="number" min="0" max="1000000" step="1" inputmode="decimal" value="0"></span>
-          </label>
           <label><span>Target margin <span class="hint" title="A route meeting or exceeding this net margin receives a TAKE recommendation.">?</span></span>
             <span class="input-wrap"><input name="targetMargin" type="number" min="0" max="100" step="1" inputmode="decimal" value="15"><span>%</span></span>
           </label>
-        </fieldset>
+          <label>Other route costs
+            <span class="input-wrap"><span>$</span><input name="otherCosts" type="number" min="0" max="1000000" step="1" inputmode="decimal" value="0"></span>
+          </label>
+          </div>
+        </details>
       </form>
 
       <section class="result-band" aria-labelledby="result-title">

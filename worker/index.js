@@ -280,7 +280,7 @@ The homepage includes a live public chat room for route and operating-cost discu
 
 - WebMCP tools on the homepage: calculate a route, load a scenario for review, and read this guide.
 - Remote MCP clients can connect to ${origin}/mcp using Streamable HTTP without credentials. Tools calculate route estimates and read this guide.
-- The fuel lookup uses EIA weekly on-highway diesel averages for the U.S. or the region serving a ZIP or approximate location. Drivers can apply the estimate or enter their own price.
+- The visible calculator automatically applies the EIA weekly U.S. diesel average or the region serving a saved or permitted location. Drivers can enter a custom price. Shared routes keep their supplied price. The API and MCP tools use their published example defaults unless callers supply a fuel price.
 - [Public route-profit API](${origin}/openapi.json)
 - [Agent skill](${origin}${SKILL_PATH})
 - [Agent skills index](${origin}/.well-known/agent-skills/index.json)

@@ -22,6 +22,10 @@ async function get(url, ttl) {
 }
 
 async function resolveState(input) {
+  if (Object.hasOwn(input, "state")) {
+    if (typeof input.state !== "string" || !/^[A-Z]{2}$/.test(input.state)) throw invalid("Invalid state.");
+    return input.state;
+  }
   if (Object.hasOwn(input, "zip")) {
     if (typeof input.zip !== "string" || !/^\d{5}$/.test(input.zip)) throw invalid("Enter a five-digit U.S. ZIP.");
     const data = await (await get("https://api.zippopotam.us/us/" + input.zip, 86400)).json();

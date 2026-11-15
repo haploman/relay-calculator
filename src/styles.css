@@ -148,6 +148,25 @@ a { color: inherit; }
 #fuel-lookup small { display: block; color: var(--muted); }
 #fuel-daily { display: inline-block; margin-top: 6px; text-underline-offset: 3px; }
 
+#profit-form { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.load-inputs { min-width: 0; border: 0; padding: 0; margin: 0; }
+.load-inputs legend { float: left; width: 100%; padding: 14px 20px 0; font: 800 1.14rem "Manrope", sans-serif; }
+.load-fields { clear: both; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; padding: 12px 20px 18px; }
+.load-fields label { min-width: 0; display: grid; align-content: end; gap: 5px; color: var(--text); font-size: .89rem; }
+.preferences { border-top: 1px solid var(--line); }
+#profit-form .preferences { margin: 0; }
+#profit-form summary { padding: 13px 20px; color: var(--text); cursor: pointer; font-weight: 700; font-size: .94rem; }
+.preferences summary span { padding-left: .55em; color: var(--muted); font-size: .83rem; font-weight: 500; }
+.preferences summary:hover, .preferences summary:focus-visible { background: var(--surface-strong); }
+.fuel-options { padding: 0 20px 18px; }
+.fuel-options button { min-height: 44px; }
+#fuel-status:empty { display: none; }
+@media (max-width: 760px) {
+  .load-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px 12px; padding-inline: 14px; }
+  .load-inputs legend, #profit-form summary, .fuel-options { padding-inline: 14px; }
+  .preferences summary span { display: block; padding: 4px 0 0 1.25em; }
+}
+
 .result-band {
   display: grid;
   grid-template-columns: 1.25fr .8fr 1.2fr 1.05fr 1.45fr;

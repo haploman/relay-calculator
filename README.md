@@ -6,7 +6,7 @@ Independent trucking route-profit calculator for `relaycalculator.com`. This is 
 
 Remote MCP clients can connect to `https://relaycalculator.com/mcp` over Streamable HTTP with no credentials. The remote tools are `calculate_relay_route_profit` and `read_relay_calculator_guide`.
 
-The optional diesel lookup uses EIA’s weekly national and regional on-highway diesel survey. ZIP entry uses Zippopotam.us to find the state. “Use my location” rounds browser coordinates to two decimal places before a U.S. Census state lookup. Drivers choose whether to apply the returned price or open AAA’s daily report.
+The calculator automatically applies EIA’s weekly on-highway diesel price. It uses the national average by default, or the driver’s saved state or permitted device location. ZIP entry uses Zippopotam.us. Device coordinates are rounded to two decimal places for the U.S. Census state lookup. A one-year first-party settings cookie remembers the state, last weekly benchmark, manual diesel preference and recurring truck costs. Shared route prices are preserved.
 
 ```sh
 npm install

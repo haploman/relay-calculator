@@ -1,5 +1,6 @@
 import "./styles.css";
-import "./fuel.js";
+import { setupFuel, useScenarioFuel } from "./fuel.js";
+import { settings, recurringFields, saveSettings } from "./settings.js";
 import roadIcon from "@tabler/icons/outline/road.svg?raw";
 import truckIcon from "@tabler/icons/outline/truck.svg?raw";
 import circleCheckIcon from "@tabler/icons/outline/circle-check.svg?raw";
@@ -28,6 +29,8 @@ const integer = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 const compactCurrency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 3 });
 const STORAGE_KEY = "relay-calculator-scenario-v2";
 const parameterKeys = { p: "payout", b: "baseRate", lm: "loadedMiles", dm: "deadheadMiles", fp: "fuelPrice", mpg: "mpg", ins: "insurance", tf: "truckFixed", mm: "maintenancePerMile", dp: "driverPercentage", xp: "dispatcherPercentage", oc: "otherCosts", tm: "targetMargin" };
+const query = new URLSearchParams(location.search);
+let visitingScenario = Object.keys(parameterKeys).some(key => query.has(key));
 
 function scenarioFromForm() {
   return normalizeScenario(Object.fromEntries(new FormData(form).entries()));
@@ -48,17 +51,15 @@ function saveScenario(scenario) {
 }
 
 function loadInitialScenario() {
-  const params = new URLSearchParams(location.search);
   const fromUrl = {};
   for (const [short, long] of Object.entries(parameterKeys)) {
-    if (params.has(short)) fromUrl[long] = params.get(short);
+    if (query.has(short)) fromUrl[long] = query.get(short);
   }
   if (Object.keys(fromUrl).length) return normalizeScenario({ ...DEFAULT_SCENARIO, ...fromUrl });
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
-    if (saved) return normalizeScenario(saved);
-  } catch { /* Ignore malformed local data. */ }
-  return DEFAULT_SCENARIO;
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { /* Optional route draft. */ }
+  const recurring = Object.fromEntries(recurringFields.filter(key => Number.isFinite(settings[key])).map(key => [key, settings[key]]));
+  return normalizeScenario({ ...DEFAULT_SCENARIO, ...saved, ...recurring });
 }
 
 function setText(id, value) {
@@ -75,10 +76,7 @@ function render(input) {
   shareStatus.textContent = "";
   const result = calculateRouteProfit(input);
   const { scenario } = result;
-  setText("strip-payout", currency.format(scenario.payout));
-  setText("strip-loaded", integer.format(scenario.loadedMiles));
-  setText("strip-deadhead", integer.format(scenario.deadheadMiles));
-  setText("strip-total", integer.format(result.totalMiles));
+  setText("settings-summary", `${scenario.mpg} MPG · ${scenario.driverPercentage}% driver · ${scenario.targetMargin}% target`);
   setText("net-profit", currency.format(result.netProfit));
   setText("margin", formatPercent(result.margin));
   setText("net-per-mile", `${currency.format(result.netPerTotalMile)} / mi`);
@@ -133,7 +131,11 @@ form.addEventListener("input", (event) => {
   if (!event.target.name) return;
   const scenario = scenarioFromForm();
   render(scenario);
-  saveScenario(scenario);
+  if (!visitingScenario) {
+    saveScenario(scenario);
+    const key = event.target.name;
+    if (recurringFields.includes(key) && event.target.value !== "") saveSettings({ [key]: scenario[key] });
+  }
   shareStatus.textContent = "";
 });
 
@@ -155,4 +157,13 @@ shareButton.addEventListener("click", async () => {
 });
 
 setScenario(loadInitialScenario(), { persist: false });
-registerWebMcpTools({ onLoadScenario: (scenario) => setScenario(scenario) }).catch(() => {});
+if (!visitingScenario) {
+  const initial = scenarioFromForm();
+  saveSettings(Object.fromEntries(recurringFields.map(key => [key, initial[key]])));
+}
+setupFuel({ sharedPrice: query.has("fp"), render: () => render(scenarioFromForm()), remember: () => !visitingScenario });
+registerWebMcpTools({ onLoadScenario: (scenario) => {
+  visitingScenario = true;
+  setScenario(scenario, { persist: false });
+  useScenarioFuel();
+} }).catch(() => {});
