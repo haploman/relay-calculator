@@ -1,0 +1,20 @@
+{
+  "name": "relay-calculator",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "node --test tests/calculator.test.mjs tests/webmcp.test.mjs",
+    "check": "npm run build && npm test"
+  },
+  "dependencies": {
+    "@tabler/icons": "3.46.0"
+  },
+  "devDependencies": {
+    "vite": "6.4.2",
+    "wrangler": "4.156.0"
+  }
+}

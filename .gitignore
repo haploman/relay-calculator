@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+.DS_Store
+sales-assets/render-*.png
+sales-assets/comparison-*.png

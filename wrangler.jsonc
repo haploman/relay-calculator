@@ -1,0 +1,32 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "relay-calculator",
+  "account_id": "3ee60842cc3d21df5a41347754714654",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-10-30",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": true,
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": true,
+    "not_found_handling": "404-page"
+  },
+  "durable_objects": {
+    "bindings": [
+      { "name": "TRUCKER_CHAT", "class_name": "TruckerChatRoom" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["TruckerChatRoom"] }
+  ],
+  "routes": [
+    { "pattern": "relaycalculator.com", "custom_domain": true },
+    { "pattern": "www.relaycalculator.com", "custom_domain": true }
+  ],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}
