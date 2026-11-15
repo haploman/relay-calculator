@@ -87,6 +87,7 @@ function connect() {
       online.textContent = `${payload.online} online`;
     } else if (payload.type === "message") {
       addMessage(payload.message, payload.mine);
+      if (!payload.mine) document.dispatchEvent(new Event("relay-chat-message"));
       if (payload.mine) {
         messageInput.value = "";
         count.textContent = "0";

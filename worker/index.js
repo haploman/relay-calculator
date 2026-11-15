@@ -1,6 +1,7 @@
 import { calculateRouteProfit, FIELD_LIMITS, serializableResult } from "../src/calculator.js";
 import { handleMcp, serverCard } from "./mcp.js";
 import { findFuel } from "./fuel.js";
+import { inquiry } from "./inquiry.js";
 export { TruckerChatRoom } from "./trucker-chat-room.js";
 
 const CUSTOM_HOST = "relaycalculator.com";
@@ -76,6 +77,7 @@ export async function handle(request, env) {
   const url = new URL(request.url);
   const redirect = canonicalRedirect(url, request);
   if (redirect) return secure(request, redirect);
+  if (url.pathname === "/api/inquiry") return secure(request, await inquiry(request, env, readJson));
 
   if (url.pathname === "/mcp") return secure(request, await handleMcp(request, serviceGuide(url)));
   if (["/mcp/server-card", "/.well-known/mcp/server-card.json"].includes(url.pathname)) {
@@ -259,6 +261,8 @@ Independent route estimates.
 
 [Open the calculator](${origin}/)
 
+[Calculator help and private support form](${origin}/help/) — worked example, saved settings and fuel-price guidance.
+
 The calculation runs in the visitor's browser. Share links contain only the numbers shown in the calculator. RelayCalculator.com does not book loads, read a Relay account, or receive shared calculation values.
 
 ## Trucker Chat
@@ -303,7 +307,7 @@ function robots(url) {
 
 function sitemap(url) {
   const origin = originFor(url);
-  const pages = ["/", "/llms.txt", SKILL_PATH, "/openapi.json"];
+  const pages = ["/", "/help/", "/llms.txt", SKILL_PATH, "/openapi.json"];
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${pages.map((path) => `\n  <url><loc>${xml(origin + path)}</loc></url>`).join("")}\n</urlset>\n`;
 }
 

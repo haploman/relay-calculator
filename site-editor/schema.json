@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "title": "Relay Calculator help page",
+  "fields": [
+    { "name": "helpIntro", "type": "textarea", "label": "Help page introduction" }
+  ]
+}

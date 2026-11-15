@@ -70,6 +70,17 @@ a { color: inherit; }
   background: #10171b;
 }
 .brand-title { margin: 0; }
+#app-invite:not([hidden]) { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 14px max(18px,calc((100vw - 1500px)/2)); background: #222622; border-bottom: 1px solid var(--amber-deep); animation: invite-down .25s ease-out; }
+#app-invite p { margin: 3px 0 0; color: var(--muted); font-size: .85rem; }
+#app-invite small:empty { display: none; }
+#app-invite small { flex-basis: 100%; }
+.invite-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.invite-actions button { padding: 10px; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--canvas); color: var(--text); cursor: pointer; }
+.invite-actions [data-install] { background: var(--amber); color: #161009; font-weight: 700; }
+@keyframes invite-down { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { #app-invite:not([hidden]) { animation: none; } }
+.site-links { display: flex; flex-wrap: wrap; align-items: center; justify-content: end; gap: 0 1.1rem; }
+.site-links a { display: inline-block; padding-block: 8px; color: var(--amber); font-size: .9rem; white-space: nowrap; text-underline-offset: .2em; }
 .chat-jump { flex: none; padding-block: 12px; color: var(--amber); font-weight: 700; text-underline-offset: .22em; }
 .brand-lockup { display: flex; align-items: center; gap: 17px; min-width: 0; }
 .brand-icon { color: var(--amber); font-size: 2.5rem; }

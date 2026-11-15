@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Trucking Route Profit Calculator Help | Relay Calculator</title>
+    <meta name="description" content="Learn how to estimate load profit after deadhead miles, diesel and crew pay. See a worked example, adjust saved truck costs, or contact Relay Calculator.">
+    <link rel="canonical" href="https://relaycalculator.com/help/">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="apple-touch-icon" href="/app-192.png">
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Relay Route Profit Calculator">
+    <meta property="og:url" content="https://relaycalculator.com/help/">
+    <meta property="og:title" content="How to use Relay Calculator">
+    <meta property="og:description" content="Work through a load estimate, check the fuel and pay assumptions, or ask for help.">
+    <meta property="og:image" content="https://relaycalculator.com/route-calculator.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Route payout, mileage and operating cost inputs in Relay Calculator">
+    <meta name="twitter:card" content="summary_large_image">
+    <script type="application/ld+json">
+      {"@context":"https://schema.org","@graph":[
+        {"@type":["AboutPage","ContactPage"],"@id":"https://relaycalculator.com/help/#page","url":"https://relaycalculator.com/help/","name":"Trucking Route Profit Calculator Help","inLanguage":"en-US","isPartOf":{"@id":"https://relaycalculator.com/#website"},"about":{"@id":"https://relaycalculator.com/#calculator"},"breadcrumb":{"@id":"https://relaycalculator.com/help/#breadcrumb"}},
+        {"@type":"BreadcrumbList","@id":"https://relaycalculator.com/help/#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Calculator","item":"https://relaycalculator.com/"},{"@type":"ListItem","position":2,"name":"About & Help","item":"https://relaycalculator.com/help/"}]}
+      ]}
+    </script>
+    <link rel="stylesheet" href="/src/styles.css">
+    <link rel="stylesheet" href="/src/help.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to help</a>
+    <header class="site-header">
+      <a class="brand-lockup help-brand" href="/"><img src="/favicon.svg" width="34" height="34" alt=""><span class="brand-title"><strong>Relay</strong> Route Profit Calculator</span></a>
+      <nav class="site-links" aria-label="Main navigation"><a href="/">Calculator</a><a href="#contact">Contact</a></nav>
+    </header>
+    <main class="help-shell" id="main">
+      <nav class="crumb" aria-label="Breadcrumb"><a href="/">Calculator</a> / About &amp; help</nav>
+      <h1>How to estimate load profit</h1>
+      <p class="help-intro">{{helpIntro}}</p>
+      <div class="help-columns">
+        <article>
+          <h2>Start with the offer</h2>
+          <p>Enter the <strong>payout</strong> you’ll receive, including any fuel surcharge. Enter the <strong>base rate</strong> your driver and dispatcher percentages apply to. If their pay excludes the surcharge, use the linehaul amount as the base.</p>
+          <h2>Count the empty miles</h2>
+          <p>A 500-mile load with 100 miles of deadhead puts 600 miles on the truck. At 8 MPG, that takes 75 gallons. Using an example diesel price of $4 per gallon, budget <strong>$300 for fuel</strong>. On a $1,500 payout, that leaves $1,200 before pay, maintenance, and other costs.</p>
+          <h2>Read the result</h2>
+          <p>Net profit is payout minus all entered costs. Net per mile divides that profit by loaded and deadhead miles together. <strong>TAKE</strong> meets your target margin, <strong>REPRICE</strong> shows a positive profit below target, and <strong>SKIP</strong> means the estimated costs consume the payout.</p>
+          <h2>Common questions</h2>
+          <details><summary>Which diesel price does my route use?</summary><p>The calculator starts with the EIA weekly national on-highway diesel average. Use a ZIP or permitted location for the regional benchmark, or type your own pump price. The Diesel row shows the active price. <a href="https://www.eia.gov/petroleum/gasdiesel/">See the EIA survey</a>.</p></details>
+          <details><summary>Where do I change my truck costs?</summary><p>Open Truck &amp; pay settings to enter MPG, insurance, truck cost, maintenance, crew percentages, and target margin. Allocate fixed costs to this trip. For example, use two days of insurance on a two-day route. Your browser remembers recurring settings for up to a year.</p></details>
+          <details><summary>How do I share a calculation?</summary><p>Use Copy share link under Route math. Anyone with the link can see the route numbers, including the diesel price and pay assumptions. Trucker Chat is public. Use the contact form for a private question about the calculator.</p></details>
+          <p><a class="help-back" href="/">Open the route calculator →</a></p>
+        </article>
+        <section id="contact" aria-labelledby="contact-heading">
+          <h2 id="contact-heading">Contact Relay Calculator</h2>
+          <p>Ask about a result, report a problem, or suggest an improvement.</p>
+          <form id="help-form" method="post" action="/api/inquiry">
+            <noscript><p>Enable JavaScript to send your question through this form.</p></noscript>
+            <label>Your name<input name="name" autocomplete="name" maxlength="100" required></label>
+            <label>Reply email<input name="email" type="email" autocomplete="email" maxlength="254" required></label>
+            <label>How can we help?<textarea name="message" rows="5" maxlength="2000" required></textarea></label>
+            <p class="form-note">For calculation questions, include the inputs and result you expected. Leave out load IDs and private account details.</p>
+            <button type="submit">Send message</button>
+            <p id="form-status" role="status" aria-live="polite"></p>
+          </form>
+        </section>
+      </div>
+    </main>
+    <footer class="site-footer"><p>Relay Route Profit Calculator</p><a href="/">Back to calculator</a></footer>
+    <script type="module" src="/src/help.js"></script>
+  </body>
+</html>

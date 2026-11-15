@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#11171b">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="apple-touch-icon" href="/app-192.png">
     <meta name="description" content="Calculate route profit, margin, and net per mile before accepting a trucking load, then compare notes in live Trucker Chat.">
     <meta name="robots" content="index, follow, max-image-preview:large">
     <link rel="canonical" href="https://relaycalculator.com/">
@@ -17,7 +19,9 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://relaycalculator.com/">
     <meta property="og:site_name" content="Relay Route Profit Calculator">
-    <meta name="twitter:card" content="summary">
+    <meta property="og:image" content="https://relaycalculator.com/route-calculator.png">
+    <meta property="og:image:alt" content="Route payout, mileage and operating cost inputs in Relay Calculator">
+    <meta name="twitter:card" content="summary_large_image">
     <title>Relay Route Profit Calculator | Trucking Route Calculator</title>
     <!-- BusinessStub GA4: injected by the managed-domain gateway after a dedicated property is connected. Do not add gtag.js or a measurement ID here. -->
     <script type="application/ld+json">
@@ -52,8 +56,13 @@
         <span class="brand-icon" data-icon="road"></span>
         <h1 class="brand-title"><strong>Relay</strong> Route Profit Calculator</h1>
       </div>
-      <a class="chat-jump" href="#chat-title">Trucker Chat ↓</a>
+      <nav class="site-links" aria-label="Main navigation"><a href="/help/">Help</a><a href="#chat-title">Trucker Chat ↓</a></nav>
     </header>
+    <aside id="app-invite" aria-label="Home screen and chat alerts" hidden>
+      <div><strong>Keep Relay Calculator handy</strong><p>Add it to your home screen or get alerts while Trucker Chat is open in the background.</p></div>
+      <div class="invite-actions"><button type="button" data-install>Add to home screen</button><button type="button" data-alerts>Enable chat alerts</button><button type="button" data-later>Not now</button></div>
+      <small role="status"></small>
+    </aside>
 
     <main id="calculator" class="app-shell">
       <form id="profit-form" novalidate>
@@ -209,5 +218,6 @@
     </footer>
     <script type="module" src="/src/main.js"></script>
     <script type="module" src="/src/chat.js"></script>
+    <script type="module" src="/src/install.js"></script>
   </body>
 </html>
