@@ -1,3 +1,4 @@
+import { cleanNickname } from "./chat-input.js";
 import { calculateRouteProfit, FIELD_LIMITS, serializableResult } from "../src/calculator.js";
 import { handleMcp, serverCard } from "./mcp.js";
 import { findFuel } from "./fuel.js";
@@ -79,7 +80,7 @@ export async function handle(request, env) {
   if (redirect) return secure(request, redirect);
   if (url.pathname === "/api/inquiry") return secure(request, await inquiry(request, env, readJson));
 
-  if (url.pathname === "/mcp") return secure(request, await handleMcp(request, serviceGuide(url)));
+  if (url.pathname === "/mcp") return secure(request, await handleMcp(request, serviceGuide(url), env.TRUCKER_CHAT));
   if (["/mcp/server-card", "/.well-known/mcp/server-card.json"].includes(url.pathname)) {
     const legacy = url.pathname.endsWith(".json");
     return secure(request, await routeDocument(request, () => publicJson(serverCard(originFor(url), legacy), legacy ? "application/json" : "application/mcp-server-card+json")));
@@ -168,10 +169,6 @@ function sameHostOrigin(origin, url) {
   }
 }
 
-function cleanNickname(value) {
-  const nickname = value.normalize("NFKC").replace(/\s+/g, " ").trim();
-  return nickname.length >= 2 && nickname.length <= 24 && /^[\p{L}\p{N} _-]+$/u.test(nickname) ? nickname : "";
-}
 
 function canonicalRedirect(url, request) {
   const canonical = new URL(url);
@@ -267,7 +264,7 @@ The calculation runs in the visitor's browser. Share links contain only the numb
 
 ## Trucker Chat
 
-The homepage includes a live public chat room for route and operating-cost discussion. Visitors choose a public nickname. The room retains the latest 100 messages and applies basic rate limits. It is user-generated content, not a source of verified rates or operational advice, and is not exposed as an agent tool.
+The homepage includes a live public chat room for route and operating-cost discussion. Visitors choose a public nickname. The room retains the latest 100 messages and applies basic rate limits. Public MCP clients can read recent messages and post under a nickname. Messages contain unverified user-generated content.
 
 ## Formula
 
@@ -283,7 +280,7 @@ The homepage includes a live public chat room for route and operating-cost discu
 ## Agent access
 
 - WebMCP tools on the homepage: calculate a route, load a scenario for review, and read this guide.
-- Remote MCP clients can connect to ${origin}/mcp using Streamable HTTP without credentials. Tools calculate route estimates and read this guide.
+- Remote MCP clients can connect to ${origin}/mcp using Streamable HTTP without credentials. Tools calculate route estimates, read this guide, and access Trucker Chat with read_trucker_chat and post_trucker_chat.
 - The visible calculator automatically applies the EIA weekly U.S. diesel average or the region serving a saved or permitted location. Drivers can enter a custom price. Shared routes keep their supplied price. The API and MCP tools use their published example defaults unless callers supply a fuel price.
 - [Public route-profit API](${origin}/openapi.json)
 - [Agent skill](${origin}${SKILL_PATH})

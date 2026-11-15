@@ -1,7 +1,8 @@
 import { DurableObject } from "cloudflare:workers";
 
+import { cleanMessage, MAX_MESSAGE_LENGTH } from "./chat-input.js";
+
 const MAX_MESSAGES = 100;
-const MAX_MESSAGE_LENGTH = 400;
 const RATE_WINDOW_MS = 60_000;
 const RATE_LIMIT = 12;
 const MIN_INTERVAL_MS = 1_500;
@@ -22,6 +23,13 @@ export class TruckerChatRoom extends DurableObject {
           created_at INTEGER NOT NULL
         );
         CREATE INDEX IF NOT EXISTS messages_created_at ON messages(created_at DESC, id DESC);
+        CREATE TABLE IF NOT EXISTS mcp_posts (
+          request_id TEXT PRIMARY KEY,
+          client_key TEXT NOT NULL,
+          message_id INTEGER NOT NULL,
+          created_at INTEGER NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS mcp_posts_client_time ON mcp_posts(client_key, created_at);
         INSERT OR IGNORE INTO _sql_schema_migrations (id) VALUES (1);
       `);
     });
@@ -42,10 +50,7 @@ export class TruckerChatRoom extends DurableObject {
       recentTimestamps: [],
     });
 
-    const history = this.ctx.storage.sql.exec(
-      "SELECT id, nickname, body, created_at AS createdAt FROM messages ORDER BY created_at DESC, id DESC LIMIT ?",
-      MAX_MESSAGES,
-    ).toArray().reverse();
+    const history = this.readMessages(MAX_MESSAGES);
     server.send(JSON.stringify({ type: "welcome", history, online: this.ctx.getWebSockets().length }));
     this.broadcastPresence();
     return new Response(null, { status: 101, webSocket: client });
@@ -68,27 +73,71 @@ export class TruckerChatRoom extends DurableObject {
       recent.push(now);
       ws.serializeAttachment({ ...state, recentTimestamps: recent });
 
-      const inserted = this.ctx.storage.sql.exec(
-        "INSERT INTO messages (nickname, body, created_at) VALUES (?, ?, ?) RETURNING id",
-        state.nickname,
-        body,
-        now,
-      ).one();
-      this.ctx.storage.sql.exec(
-        "DELETE FROM messages WHERE id NOT IN (SELECT id FROM messages ORDER BY created_at DESC, id DESC LIMIT ?)",
-        MAX_MESSAGES,
-      );
-
-      for (const socket of this.ctx.getWebSockets()) {
-        const target = socket.deserializeAttachment();
-        socket.send(JSON.stringify({
-          type: "message",
-          message: { id: inserted.id, nickname: state.nickname, body, createdAt: now },
-          mine: target?.sessionId === state.sessionId,
-        }));
-      }
+      const message = this.saveMessage(state.nickname, body, now);
+      this.broadcastMessage(message, state.sessionId);
     } catch {
       this.sendError(ws, "That message could not be sent.");
+    }
+  }
+
+  readMessages(limit) {
+    return this.ctx.storage.sql.exec(
+      "SELECT id, nickname, body, created_at AS createdAt FROM messages ORDER BY created_at DESC, id DESC LIMIT ?",
+      limit,
+    ).toArray().reverse();
+  }
+
+  saveMessage(nickname, body, now) {
+    const { id } = this.ctx.storage.sql.exec(
+      "INSERT INTO messages (nickname, body, created_at) VALUES (?, ?, ?) RETURNING id",
+      nickname, body, now,
+    ).one();
+    this.ctx.storage.sql.exec(
+      "DELETE FROM messages WHERE id NOT IN (SELECT id FROM messages ORDER BY created_at DESC, id DESC LIMIT ?)",
+      MAX_MESSAGES,
+    );
+    return { id, nickname, body, createdAt: now };
+  }
+
+  postFromMcp(nickname, body, clientKey, requestId) {
+    const sql = this.ctx.storage.sql;
+    const now = Date.now();
+    const result = this.ctx.storage.transactionSync(() => {
+      sql.exec(
+        "DELETE FROM mcp_posts WHERE created_at <= ? AND message_id NOT IN (SELECT id FROM messages)",
+        now - RATE_WINDOW_MS,
+      );
+      const existing = sql.exec(
+        `SELECT m.id, m.nickname, m.body, m.created_at AS createdAt FROM mcp_posts p
+         LEFT JOIN messages m ON m.id = p.message_id WHERE p.request_id = ?`,
+        requestId,
+      ).toArray()[0];
+      if (existing) {
+        if (existing.nickname === nickname && existing.body === body) return { message: existing, replay: true };
+        return { error: "This request ID has already been used." };
+      }
+      const rate = sql.exec(
+        "SELECT COUNT(*) AS count, MAX(created_at) AS latest FROM mcp_posts WHERE client_key = ? AND created_at > ?",
+        clientKey, now - RATE_WINDOW_MS,
+      ).one();
+      if (rate.count >= RATE_LIMIT || (rate.latest !== null && now - rate.latest < MIN_INTERVAL_MS)) {
+        return { error: "Posting too quickly. Wait before trying again." };
+      }
+      const message = this.saveMessage(nickname, body, now);
+      sql.exec("INSERT INTO mcp_posts (request_id, client_key, message_id, created_at) VALUES (?, ?, ?, ?)",
+        requestId, clientKey, message.id, now);
+      return { message, replay: false };
+    });
+    if (result.message && !result.replay) this.broadcastMessage(result.message);
+    return result;
+  }
+
+  broadcastMessage(message, senderId) {
+    for (const socket of this.ctx.getWebSockets()) {
+      try {
+        const mine = Boolean(senderId && socket.deserializeAttachment()?.sessionId === senderId);
+        socket.send(JSON.stringify({ type: "message", message, mine }));
+      } catch { /* A closed connection must not interrupt delivery to other drivers. */ }
     }
   }
 
@@ -111,8 +160,4 @@ export class TruckerChatRoom extends DurableObject {
       try { socket.send(payload); } catch { /* The runtime will remove closed sockets. */ }
     }
   }
-}
-
-function cleanMessage(value) {
-  return value.normalize("NFKC").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").replace(/\s+/g, " ").trim();
 }
