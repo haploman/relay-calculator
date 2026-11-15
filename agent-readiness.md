@@ -1,5 +1,9 @@
 # Agent readiness evidence
 
+## Remote MCP release
+
+The production scan at 2026-11-15T03:06:05Z returned Level 4 (Agent-Integrated) and passed the MCP server-card check. An official TypeScript MCP client discovered both tools on the canonical endpoint, called the guide, and received $483 estimated net profit for a $2,000 payout using the other example inputs.
+
 ## Public deployment
 
 - Canonical URL: `https://relaycalculator.com/`

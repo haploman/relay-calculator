@@ -25,7 +25,7 @@ const shareStatus = document.querySelector("#share-status");
 const shareUrlInput = document.querySelector("#share-url");
 const currency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 });
 const integer = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
-const compactCurrency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 });
+const compactCurrency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 3 });
 const STORAGE_KEY = "relay-calculator-scenario-v2";
 const parameterKeys = { p: "payout", b: "baseRate", lm: "loadedMiles", dm: "deadheadMiles", fp: "fuelPrice", mpg: "mpg", ins: "insurance", tf: "truckFixed", mm: "maintenancePerMile", dp: "driverPercentage", xp: "dispatcherPercentage", oc: "otherCosts", tm: "targetMargin" };
 
