@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#11171b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="manifest" href="/site.webmanifest">
     <link rel="apple-touch-icon" href="/app-192.png">
@@ -52,10 +54,10 @@
   <body>
     <a class="skip-link" href="#calculator">Skip to calculator</a>
     <header class="site-header">
-      <div class="brand-lockup">
-        <span class="brand-icon" data-icon="road"></span>
-        <h1 class="brand-title"><strong>Relay</strong> Route Profit Calculator</h1>
-      </div>
+      <h1 class="brand-title"><a class="brand-lockup" href="/" aria-label="Relay Route Profit Calculator home">
+        <span class="brand-icon" data-icon="road" aria-hidden="true"></span>
+        <span><strong>Relay</strong> Route Profit Calculator</span>
+      </a></h1>
       <nav class="site-links" aria-label="Main navigation"><a href="/help/">Help</a><a href="#chat-title">Trucker Chat ↓</a></nav>
     </header>
     <aside id="app-invite" aria-label="Home screen and chat alerts" hidden>
