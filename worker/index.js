@@ -86,6 +86,13 @@ export async function handle(request, env) {
   if (url.pathname === "/.well-known/agent-skills/index.json") return secure(request, await routeDocument(request, () => agentSkills(url)));
   if (url.pathname === "/.well-known/ai-catalog.json") return secure(request, await routeDocument(request, () => aiCatalog(url)));
   if (url.pathname === "/.well-known/api-catalog") return secure(request, await routeDocument(request, () => apiCatalog(url)));
+  if (url.pathname === "/.well-known/poppy.json" && url.hostname === CUSTOM_HOST) {
+    return secure(request, await routeDocument(request, () => publicJson({
+      protocol_version: "1.0",
+      organization: { name: "Relay Route Profit Calculator", domain: CUSTOM_HOST },
+      web: {},
+    })));
+  }
   if (url.pathname === "/.well-known/security.txt") return secure(request, await routeDocument(request, () => text(`Canonical: ${originFor(url)}/.well-known/security.txt\nExpires: 2027-11-14T00:00:00Z\n`, "text/plain; charset=utf-8")));
   if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/.well-known/")) return secure(request, json({ ok: false, error: "Not found" }, 404));
 
