@@ -1,4 +1,6 @@
 import { calculateRouteProfit, FIELD_LIMITS, serializableResult } from "../src/calculator.js";
+import { handleMcp, serverCard } from "./mcp.js";
+import { findFuel } from "./fuel.js";
 export { TruckerChatRoom } from "./trucker-chat-room.js";
 
 const CUSTOM_HOST = "relaycalculator.com";
@@ -74,6 +76,20 @@ export async function handle(request, env) {
   const url = new URL(request.url);
   const redirect = canonicalRedirect(url, request);
   if (redirect) return secure(request, redirect);
+
+  if (url.pathname === "/mcp") return secure(request, await handleMcp(request, serviceGuide(url)));
+  if (["/mcp/server-card", "/.well-known/mcp/server-card.json"].includes(url.pathname)) {
+    const legacy = url.pathname.endsWith(".json");
+    return secure(request, await routeDocument(request, () => publicJson(serverCard(originFor(url), legacy), legacy ? "application/json" : "application/mcp-server-card+json")));
+  }
+  if (url.pathname === "/api/fuel") {
+    if (request.method !== "POST") return secure(request, methodNotAllowed("POST"));
+    try {
+      return secure(request, json(await findFuel(await readJson(request, 512))));
+    } catch (error) {
+      return secure(request, json({ error: error.status ? error.message : "Fuel lookup unavailable." }, error.status || 503));
+    }
+  }
 
   if (url.pathname === "/api/chat/general") return handleChat(request, env);
   if (url.pathname === "/api/calculate") return secure(request, await calculateApi(request));
@@ -263,6 +279,8 @@ The homepage includes a live public chat room for route and operating-cost discu
 ## Agent access
 
 - WebMCP tools on the homepage: calculate a route, load a scenario for review, and read this guide.
+- Remote MCP clients can connect to ${origin}/mcp using Streamable HTTP without credentials. Tools calculate route estimates and read this guide.
+- The fuel lookup uses EIA weekly on-highway diesel averages for the U.S. or the region serving a ZIP or approximate location. Drivers can apply the estimate or enter their own price.
 - [Public route-profit API](${origin}/openapi.json)
 - [Agent skill](${origin}${SKILL_PATH})
 - [Agent skills index](${origin}/.well-known/agent-skills/index.json)
@@ -311,6 +329,10 @@ function aiCatalog(url) {
     specVersion: "1.0",
     host: { displayName: "Relay Route Profit Calculator", documentationUrl: `${origin}/llms.txt` },
     entries: [{
+      identifier: "urn:air:relaycalculator.com:mcp:route-profit",
+      type: "application/mcp-server-card+json",
+      url: `${origin}/mcp/server-card`,
+    }, {
       identifier: "urn:air:relaycalculator.com:skill:calculate-relay-route-profit",
       displayName: "Calculate Relay route profit",
       type: "text/markdown",
@@ -417,7 +439,7 @@ function secure(request, response) {
   const headers = new Headers(response.headers);
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=(), usb=()");
+  headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(self), payment=(), usb=()");
   headers.set("Cross-Origin-Opener-Policy", "same-origin");
   headers.set("X-Frame-Options", "DENY");
   headers.set("Content-Signal", "search=yes, ai-input=yes");

@@ -1,4 +1,5 @@
 import "./styles.css";
+import "./fuel.js";
 import roadIcon from "@tabler/icons/outline/road.svg?raw";
 import truckIcon from "@tabler/icons/outline/truck.svg?raw";
 import circleCheckIcon from "@tabler/icons/outline/circle-check.svg?raw";
@@ -21,6 +22,7 @@ for (const node of document.querySelectorAll("[data-icon]")) {
 const form = document.querySelector("#profit-form");
 const shareButton = document.querySelector("#share-button");
 const shareStatus = document.querySelector("#share-status");
+const shareUrlInput = document.querySelector("#share-url");
 const currency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 });
 const integer = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 const compactCurrency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 });
@@ -69,6 +71,8 @@ function formatPercent(value) {
 }
 
 function render(input) {
+  shareUrlInput.hidden = true;
+  shareStatus.textContent = "";
   const result = calculateRouteProfit(input);
   const { scenario } = result;
   setText("strip-payout", currency.format(scenario.payout));
@@ -107,7 +111,7 @@ function render(input) {
   const recommendation = document.getElementById("recommendation");
   const copy = {
     take: ["TAKE", `Meets your ${scenario.targetMargin}% target margin`, "circle-check"],
-    reprice: ["REPRICE", `Positive, but below your ${scenario.targetMargin}% target`, "refresh"],
+    reprice: ["REPRICE", `Below your ${scenario.targetMargin}% target margin`, "refresh"],
     skip: ["SKIP", "Estimated costs meet or exceed payout", "circle-x"],
   }[result.recommendation];
   recommendation.className = `recommendation recommendation-${result.recommendation}`;
@@ -125,7 +129,8 @@ function scenarioUrl(scenario) {
   return url.href;
 }
 
-form.addEventListener("input", () => {
+form.addEventListener("input", (event) => {
+  if (!event.target.name) return;
   const scenario = scenarioFromForm();
   render(scenario);
   saveScenario(scenario);
@@ -139,7 +144,11 @@ shareButton.addEventListener("click", async () => {
     await navigator.clipboard.writeText(url);
     shareStatus.textContent = "Share link copied. It contains only the calculator values shown here.";
   } catch {
-    shareStatus.textContent = "Copying was blocked. Your calculation remains on this device; copy the page address from the browser instead.";
+    shareUrlInput.value = url;
+    shareUrlInput.hidden = false;
+    shareUrlInput.focus();
+    shareUrlInput.select();
+    shareStatus.textContent = "Copy the selected link to share these route values.";
   } finally {
     shareButton.disabled = false;
   }

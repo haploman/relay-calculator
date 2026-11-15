@@ -13,7 +13,7 @@
     <link rel="api-catalog" type="application/linkset+json" href="/.well-known/api-catalog">
     <link rel="ai-catalog" type="application/json" href="/.well-known/ai-catalog.json">
     <meta property="og:title" content="Relay Route Profit Calculator">
-    <meta property="og:description" content="Know the real profit before you take the route, with a live public room for truckers.">
+    <meta property="og:description" content="Estimate route profit before accepting a load and compare notes in Trucker Chat.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://relaycalculator.com/">
     <meta property="og:site_name" content="Relay Route Profit Calculator">
@@ -50,9 +50,9 @@
     <header class="site-header">
       <div class="brand-lockup">
         <span class="brand-icon" data-icon="road"></span>
-        <span class="brand-title"><strong>Relay</strong> Route Profit Calculator</span>
+        <h1 class="brand-title"><strong>Relay</strong> Route Profit Calculator</h1>
       </div>
-      <p>Independent calculator. Not affiliated with Amazon.</p>
+      <a class="chat-jump" href="#chat-title">Trucker Chat ↓</a>
     </header>
 
     <main id="calculator" class="app-shell">
@@ -67,10 +67,10 @@
       <form id="profit-form" class="calculator-grid" novalidate>
         <fieldset class="input-panel">
           <legend><span class="step">1</span><span><strong>Load payout &amp; miles</strong><small>The offer, route, and fuel price.</small></span></legend>
-          <label>Payout <span class="hint" title="Total route payout including fuel surcharge.">?</span>
+          <label><span>Payout <span class="hint" title="Total route payout including fuel surcharge.">?</span></span>
             <span class="input-wrap"><span>$</span><input name="payout" type="number" min="0" max="1000000" step="10" inputmode="decimal" value="1700"></span>
           </label>
-          <label>Base rate <span class="hint" title="Linehaul amount used for percentage-based driver and dispatcher pay.">?</span>
+          <label><span>Base rate <span class="hint" title="Linehaul amount used for percentage-based driver and dispatcher pay.">?</span></span>
             <span class="input-wrap"><span>$</span><input name="baseRate" type="number" min="0" max="1000000" step="10" inputmode="decimal" value="1700"></span>
           </label>
           <label>Loaded miles
@@ -79,14 +79,24 @@
           <label>Deadhead miles
             <span class="input-wrap"><input name="deadheadMiles" type="number" min="0" max="25000" step="1" inputmode="numeric" value="170"><span>mi</span></span>
           </label>
-          <label>Fuel price
-            <span class="input-wrap"><span>$</span><input name="fuelPrice" type="number" min="0" max="100" step="0.01" inputmode="decimal" value="4.50"><span>/gal</span></span>
+          <label>Diesel price
+            <span class="input-wrap"><span>$</span><input name="fuelPrice" type="number" min="0" max="100" step="0.001" inputmode="decimal" value="4.50"><span>/gal</span></span>
           </label>
+          <details id="fuel-lookup">
+            <summary>Look up diesel prices</summary>
+            <label for="fuel-zip">U.S. ZIP (optional)</label>
+            <input id="fuel-zip" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="83702">
+            <div class="fuel-actions"><button type="button" id="fuel-find">Find average</button><button type="button" id="fuel-locate">Use my location</button></div>
+            <small>Location uses approximate coordinates to find your state. Leave ZIP blank for the U.S. average.</small>
+            <p id="fuel-status" role="status"></p>
+            <button id="fuel-apply" type="button" hidden>Use this price</button>
+            <a id="fuel-daily" href="https://gasprices.aaa.com/" target="_blank" rel="noopener">AAA daily diesel report ↗</a>
+          </details>
         </fieldset>
 
         <fieldset class="input-panel">
           <legend><span class="step">2</span><span><strong>Truck economics</strong><small>Fuel and operating costs.</small></span></legend>
-          <label>MPG <span class="hint" title="Expected fuel economy for this route.">?</span>
+          <label><span>MPG <span class="hint" title="Expected fuel economy for this route.">?</span></span>
             <span class="input-wrap"><input name="mpg" type="number" min="0.1" max="100" step="0.1" inputmode="decimal" value="10"><span>mpg</span></span>
           </label>
           <label>Insurance per route/day
@@ -111,21 +121,21 @@
           <label>Other route costs
             <span class="input-wrap"><span>$</span><input name="otherCosts" type="number" min="0" max="1000000" step="1" inputmode="decimal" value="0"></span>
           </label>
-          <label>Target margin <span class="hint" title="A route meeting or exceeding this net margin receives a TAKE recommendation.">?</span>
+          <label><span>Target margin <span class="hint" title="A route meeting or exceeding this net margin receives a TAKE recommendation.">?</span></span>
             <span class="input-wrap"><input name="targetMargin" type="number" min="0" max="100" step="1" inputmode="decimal" value="15"><span>%</span></span>
           </label>
         </fieldset>
       </form>
 
       <section class="result-band" aria-labelledby="result-title">
-        <div class="metric primary"><span id="result-title">Net profit</span><strong id="net-profit">$539.00</strong></div>
-        <div class="metric"><span>Margin</span><strong id="margin">31.7%</strong></div>
-        <div class="metric"><span>Net per total mile</span><strong id="net-per-mile">$0.46 <small>/ mi</small></strong></div>
-        <div class="metric"><span>Break-even payout</span><strong id="break-even">$1,161.00</strong></div>
-        <div id="recommendation" class="recommendation recommendation-take">
-          <span data-icon="circle-check"></span>
-          <strong>TAKE</strong>
-          <small>Meets your 15% target margin</small>
+        <div class="metric primary"><span id="result-title">Net profit</span><strong id="net-profit">$183.00</strong></div>
+        <div class="metric"><span>Margin</span><strong id="margin">10.8%</strong></div>
+        <div class="metric"><span>Net per total mile</span><strong id="net-per-mile">$0.16 <small>/ mi</small></strong></div>
+        <div class="metric"><span>Break-even payout</span><strong id="break-even">$1,517.00</strong></div>
+        <div id="recommendation" class="recommendation recommendation-reprice">
+          <span data-icon="refresh"></span>
+          <strong>REPRICE</strong>
+          <small>Below your 15% target margin</small>
         </div>
       </section>
 
@@ -139,10 +149,10 @@
             <span class="segment operating" id="bar-operating"></span>
           </div>
           <ul class="legend-list">
-            <li><i class="swatch fuel"></i><span>Fuel</span><strong id="cost-fuel">$526.50</strong><small id="percent-fuel">45.3%</small></li>
-            <li><i class="swatch driver"></i><span>Driver pay</span><strong id="cost-driver">$510.00</strong><small id="percent-driver">43.9%</small></li>
-            <li><i class="swatch dispatch"></i><span>Dispatcher</span><strong id="cost-dispatch">$85.00</strong><small id="percent-dispatch">7.3%</small></li>
-            <li><i class="swatch operating"></i><span>Other operating costs</span><strong id="cost-operating">$259.50</strong><small id="percent-operating">22.4%</small></li>
+            <li><i class="swatch fuel"></i><span>Fuel</span><strong id="cost-fuel">$526.50</strong><small id="percent-fuel">34.7%</small></li>
+            <li><i class="swatch driver"></i><span>Driver pay</span><strong id="cost-driver">$510.00</strong><small id="percent-driver">33.6%</small></li>
+            <li><i class="swatch dispatch"></i><span>Dispatcher</span><strong id="cost-dispatch">$85.00</strong><small id="percent-dispatch">5.6%</small></li>
+            <li><i class="swatch operating"></i><span>Other operating costs</span><strong id="cost-operating">$395.50</strong><small id="percent-operating">26.1%</small></li>
           </ul>
         </article>
 
@@ -157,6 +167,7 @@
             <div class="total"><dt>Total costs</dt><dd><strong id="total-costs">$1,517.00</strong></dd></div>
           </dl>
           <button id="share-button" class="share-button" type="button"><span data-icon="link"></span>Copy share link</button>
+          <input id="share-url" type="url" aria-label="Shareable route link" readonly hidden>
           <p id="share-status" class="inline-status" role="status" aria-live="polite"></p>
         </article>
       </section>
@@ -164,7 +175,7 @@
       <section class="trucker-chat" aria-labelledby="chat-title">
         <header class="chat-heading">
           <span data-icon="message-circle"></span>
-          <div><h2 id="chat-title">Trucker Chat</h2><p>A live public room for route talk. Be useful; don’t post load IDs, phone numbers, or private account details.</p></div>
+          <div><h2 id="chat-title" tabindex="-1">Trucker Chat</h2><p>A live public room for route talk. Be useful; don’t post load IDs, phone numbers, or private account details.</p></div>
           <span class="chat-presence"><i aria-hidden="true"></i><strong id="chat-online">Offline</strong></span>
         </header>
         <div class="chat-layout">
@@ -174,7 +185,7 @@
           <div class="chat-controls">
             <form id="chat-join-form" class="chat-join-form">
               <label for="chat-nickname">Nickname</label>
-              <div><input id="chat-nickname" name="nickname" minlength="2" maxlength="24" pattern="[A-Za-z0-9 _-]+" autocomplete="nickname" placeholder="Road name" required><button id="chat-connect" type="submit">Join room</button></div>
+              <div><input id="chat-nickname" name="nickname" minlength="2" maxlength="24" autocomplete="nickname" placeholder="Road name" required><button id="chat-connect" type="submit">Join room</button></div>
             </form>
             <form id="chat-message-form" class="chat-message-form">
               <label for="chat-message">Message</label>
@@ -197,7 +208,7 @@
     </main>
 
     <footer class="site-footer">
-      <p><strong>Relay Route Profit Calculator</strong><span>Independent tool for route estimates.</span></p>
+      <p><strong>Relay Route Profit Calculator</strong><span>Independent tool. Not affiliated with Amazon.</span></p>
       <p>Built as a <a href="https://businessstub.com/">BusinessStub</a> digital property.</p>
     </footer>
     <script type="module" src="/src/main.js"></script>

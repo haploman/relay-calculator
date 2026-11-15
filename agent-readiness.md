@@ -39,8 +39,8 @@
 - Expected DS: `2371 13 2 F179E9C2C40966336721B3AEFEEA2F115D60A81876C1C9454567FEE2F8EC9433`.
 - The initial scanner run correctly reported DNS-AID present but not yet DNSSEC-validated. This is a propagation/delegation follow-up, not an invitation to replace the signing key or duplicate records.
 
-## Truthful Level 4 boundary
+## Initial release scope
 
-OAuth/OIDC, Auth.md, an MCP Server Card and an A2A Agent Card are intentionally absent because the site does not operate an authenticated agent service, remote MCP transport or A2A agent. Commerce discovery is inapplicable. Publishing placeholder documents for those protocols would misrepresent the product. Level 4 is therefore the best truthful current Cloudflare level; the site implements WebMCP, API and static agent discovery that correspond to real capabilities.
+The initial scan preceded the public remote MCP endpoint and its server card. The calculator has no authenticated agent service or commerce workflow.
 
 The current Poppy 1.0 website-only manifest is also published on the canonical host. The scanner used for the initial run did not yet support that version, so it is recorded as direct evidence rather than claimed as a scanner pass.

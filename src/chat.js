@@ -17,6 +17,7 @@ let manuallyClosed = false;
 try { nicknameInput.value = localStorage.getItem(NICKNAME_KEY) || ""; } catch { /* Optional convenience only. */ }
 
 function setConnectionState(connected, message) {
+  online.parentElement.classList.toggle("connected", connected);
   nicknameInput.disabled = connected;
   connectButton.textContent = connected ? "Leave room" : "Join room";
   messageInput.disabled = !connected;
@@ -27,6 +28,7 @@ function setConnectionState(connected, message) {
 
 function setSending(value) {
   sending = value;
+  messageInput.readOnly = value;
   sendButton.disabled = value || socket?.readyState !== WebSocket.OPEN;
   sendLabel.textContent = value ? "Sending…" : "Send";
   messageForm.setAttribute("aria-busy", String(value));
@@ -112,6 +114,7 @@ joinForm.addEventListener("submit", (event) => {
   event.preventDefault();
   if (socket?.readyState === WebSocket.OPEN) {
     manuallyClosed = true;
+    connectButton.disabled = true;
     socket.close(1000, "Visitor left");
   } else if (!connectButton.disabled) connect();
 });
