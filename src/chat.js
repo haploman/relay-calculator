@@ -10,20 +10,26 @@ const status = document.getElementById("chat-status");
 const online = document.getElementById("chat-online");
 const count = document.getElementById("chat-count");
 const NICKNAME_KEY = "relay-calculator-chat-nickname-v1";
+const LEFT_KEY = "relay-calculator-chat-left-v1";
+const validName = /^[\p{L}\p{N} _-]{2,24}$/u;
 let socket;
 let sending = false;
-let manuallyClosed = false;
+let retryTimer;
+let retryDelay = 1000;
+let wantsRoom = false;
 
-try { nicknameInput.value = localStorage.getItem(NICKNAME_KEY) || ""; } catch { /* Optional convenience only. */ }
+try {
+  nicknameInput.value = localStorage.getItem(NICKNAME_KEY) || "";
+  wantsRoom = validName.test(nicknameInput.value) && localStorage.getItem(LEFT_KEY) !== "yes";
+} catch { /* Manual chat also works without browser storage. */ }
 
 function setConnectionState(connected, message) {
   online.parentElement.classList.toggle("connected", connected);
-  nicknameInput.disabled = connected;
-  connectButton.textContent = connected ? "Leave room" : "Join room";
+  nicknameInput.disabled = connected || wantsRoom || Boolean(socket);
+  connectButton.textContent = connected || wantsRoom || socket ? "Leave room" : "Join room";
   messageInput.disabled = !connected;
   sendButton.disabled = !connected || sending;
   status.textContent = message;
-  if (connected) messageInput.focus();
 }
 
 function setSending(value) {
@@ -54,26 +60,35 @@ function addMessage(message, mine = false) {
   messages.scrollTop = messages.scrollHeight;
 }
 
-function connect() {
+function connect(manual = false) {
+  if (socket) return;
+  clearTimeout(retryTimer);
   const nickname = nicknameInput.value.normalize("NFKC").replace(/\s+/g, " ").trim();
-  if (!/^[\p{L}\p{N} _-]{2,24}$/u.test(nickname)) {
+  if (!validName.test(nickname)) {
     status.textContent = "Use 2–24 letters, numbers, spaces, underscores, or hyphens.";
     nicknameInput.focus();
     return;
   }
-  manuallyClosed = false;
-  connectButton.disabled = true;
-  status.textContent = "Connecting…";
+
   const protocol = location.protocol === "https:" ? "wss:" : "ws:";
   socket = new WebSocket(`${protocol}//${location.host}/api/chat/general?name=${encodeURIComponent(nickname)}`);
 
+  const current = socket;
+  setConnectionState(false, "Connecting…");
   socket.addEventListener("open", () => {
-    connectButton.disabled = false;
-    try { localStorage.setItem(NICKNAME_KEY, nickname); } catch { /* Optional convenience only. */ }
+    if (current !== socket) return;
+    wantsRoom = true;
+    retryDelay = 1000;
+    try {
+      localStorage.setItem(NICKNAME_KEY, nickname);
+      if (manual) localStorage.removeItem(LEFT_KEY);
+    } catch { /* Keep the session working when storage is unavailable. */ }
     setConnectionState(true, `Connected as ${nickname}.`);
+    if (manual) messageInput.focus();
   });
 
   socket.addEventListener("message", (event) => {
+    if (current !== socket) return;
     let payload;
     try { payload = JSON.parse(event.data); } catch { return; }
     if (payload.type === "welcome") {
@@ -103,22 +118,61 @@ function connect() {
   });
 
   socket.addEventListener("close", () => {
-    connectButton.disabled = false;
+    if (current !== socket) return;
+    socket = null;
     setSending(false);
-    setConnectionState(false, manuallyClosed ? "Left the room." : "Chat disconnected. Join again when ready.");
     online.textContent = "Offline";
+    setConnectionState(false, wantsRoom ? "Disconnected. Rejoining…" : "Could not join. Try again.");
+    if (wantsRoom && navigator.onLine) {
+      retryTimer = setTimeout(resume, retryDelay);
+      retryDelay = Math.min(retryDelay * 2, 30000);
+    }
   });
-  socket.addEventListener("error", () => { status.textContent = "Chat could not connect."; });
+}
+
+function disconnect(message) {
+  clearTimeout(retryTimer);
+  const current = socket;
+  socket = null;
+  current?.close(1000, "Leaving chat");
+  setSending(false);
+  setConnectionState(false, message);
+  online.textContent = "Offline";
+}
+
+function leave() {
+  wantsRoom = false;
+  retryDelay = 1000;
+  disconnect("Left the room.");
+}
+
+function resume() {
+  if (wantsRoom && !socket && navigator.onLine) connect();
 }
 
 joinForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  if (socket?.readyState === WebSocket.OPEN) {
-    manuallyClosed = true;
-    connectButton.disabled = true;
-    socket.close(1000, "Visitor left");
-  } else if (!connectButton.disabled) connect();
+  if (wantsRoom || socket) {
+    try { localStorage.setItem(LEFT_KEY, "yes"); } catch { /* Leave for this visit. */ }
+    leave();
+  } else {
+    connect(true);
+  }
 });
+
+window.addEventListener("storage", (event) => {
+  if (event.key === LEFT_KEY && event.newValue === "yes") leave();
+});
+window.addEventListener("pagehide", () => disconnect("Offline"));
+window.addEventListener("pageshow", resume);
+window.addEventListener("online", resume);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) resume();
+});
+if (wantsRoom) {
+  setConnectionState(false, "Waiting to rejoin…");
+  resume();
+}
 
 messageForm.addEventListener("submit", (event) => {
   event.preventDefault();
