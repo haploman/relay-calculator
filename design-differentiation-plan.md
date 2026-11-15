@@ -14,7 +14,7 @@ Relay Route Profit Calculator is a focused pre-acceptance route economics tool f
 
 ## Avoided patterns
 
-- No Amazon logo, orange trade dress, screenshots, or implication of an official integration.
+- Use original branding and artwork throughout.
 - No oversized lifestyle hero, invented testimonials, fake live-rate feed, or unsupported revenue claims.
 - No gradient decoration, glass cards, or repeated calls to action.
 - No hidden deductions: the formula and every cost category stay visible.

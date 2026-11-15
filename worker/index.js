@@ -59,7 +59,7 @@ Use TAKE when net profit is positive and margin meets the visitor's target, REPR
 
 ## Safety and limitations
 
-This is an independent estimate, not accounting, tax, legal, safety, dispatch, or financial advice. Do not claim live Amazon Relay rates, load availability, guaranteed profit, or affiliation with Amazon. Ask the visitor to review all inputs and the visible deduction table before acting.
+This is an independent estimate, not accounting, tax, legal, safety, dispatch, or financial advice. Use the visitor’s own rates and treat load availability and profit as unverified. Ask the visitor to review all inputs and the visible deduction table before acting.
 `;
 
 export default {
@@ -253,7 +253,7 @@ function serviceGuide(url) {
 
 Estimate a trucking route's true operating profit before accepting it. Enter the offer, loaded and deadhead miles, fuel economy, operating costs, and pay splits to see net profit, margin, net per total mile, break-even payout, and a take/reprice/skip recommendation.
 
-Independent calculator. Not affiliated with Amazon.
+Independent route estimates.
 
 ## Calculator
 
@@ -361,7 +361,7 @@ function openApi(url) {
   const origin = originFor(url);
   return publicJson({
     openapi: "3.1.0",
-    info: { title: "Relay Route Profit Calculator API", version: "1.0.0", description: "A public, side-effect-free API for estimating trucking route profit. Independent and not affiliated with Amazon." },
+    info: { title: "Relay Route Profit Calculator API", version: "1.0.0", description: "A public, side-effect-free API for estimating trucking route profit. Calculations use the supplied route assumptions." },
     servers: [{ url: origin }],
     paths: {
       "/api/calculate": {
