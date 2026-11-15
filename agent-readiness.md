@@ -4,9 +4,11 @@
 
 - Canonical URL: `https://relaycalculator.com/`
 - Standard Worker URL: `https://relay-calculator.hap-loman.workers.dev/`
-- Worker version: `b6a378b5-70e7-4a08-b526-97c770b8722a`
-- Source revision at initial scan: `24b598b`
-- Scan time: `2026-11-15T01:24:52.940Z`
+- Initial Worker version: `b6a378b5-70e7-4a08-b526-97c770b8722a`
+- Final Worker version: `6c338e02-b155-4002-8643-33ac7668e93d`
+- Final deployed implementation revision: `bb2152d`
+- Initial scan: `2026-11-15T01:24:52.940Z`
+- Final scan: `2026-11-15T01:27:52.017Z`
 - Cloudflare result: **Level 4 — Agent-Integrated**
 
 ## Passing Cloudflare checks
